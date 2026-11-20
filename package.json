@@ -1,7 +1,7 @@
 {
   "name": "dsh-expert-role",
   "version": "2.2.0",
-  "description": "专家角色：领域专家库 + 尽调工作流（并行/串行/独立工作区）+ 调用可视化。",
+  "description": "专家库：按主题组织的领域资料 + 资料级检索 + 尽调工作流 + 调用可视化",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -50,5 +50,14 @@
   "license": "MIT",
   "engines": {
     "dsh": ">=0.2.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yjnmedia/dsh-expert-role-public.git"
+  },
+  "homepage": "https://github.com/yjnmedia/dsh-expert-role-public#readme",
+  "bugs": {
+    "url": "https://github.com/yjnmedia/dsh-expert-role-public/issues"
+  },
+  "author": "yjnmedia"
 }
