@@ -1,6 +1,9 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { classifyRetrieval, summarizeRetrieval } from '../lib/audit.js'
+import { mkdtemp, rm } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { classifyRetrieval, summarizeRetrieval, recordRetrievalFailure, readRetrieval } from '../lib/audit.js'
 
 const top = (expert, score) => ({ expert, title: expert, rel: 'x', score })
 
@@ -27,4 +30,25 @@ test('自检汇总：只数窗口内、按原因分类', () => {
   assert.equal(summary.byReason.close, 1)
   assert.equal(summary.byReason.cross, 1)
   assert.equal(summary.byReason.empty, 0)
+})
+
+test('检索失败也留痕：落 retrieve-failed 并计为 fallback', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'audit-fail-'))
+  try {
+    const entry = await recordRetrievalFailure(root, {
+      query: '平方反比 柔光布距离',
+      expert: 'video-shooting',
+      error: 'Cannot find package onnxruntime-node',
+    })
+    assert.equal(entry.kind, 'retrieve-failed')
+    assert.deepEqual(entry.reasons, ['fallback'])
+    assert.match(entry.error, /onnxruntime/)
+    const rows = await readRetrieval(root, 10)
+    assert.equal(rows.length, 1)
+    const summary = summarizeRetrieval(rows, { days: 7 })
+    assert.equal(summary.byReason.fallback, 1)
+    assert.equal(summary.risky, 1)
+  } finally {
+    await rm(root, { recursive: true, force: true })
+  }
 })
