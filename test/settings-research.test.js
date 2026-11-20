@@ -41,6 +41,6 @@ test('settings.json 坏了退回默认，不炸', async () => {
 test('插件自己开的调研会话不算使用者', () => {
   assert.equal(isResearchSession('session-expert-task-1234'), true)
   assert.equal(isResearchSession('session-expert-ai-image-1794793969511'), true)
-  assert.equal(isResearchSession('session-demo-2-4c66-9d3e-5f3d9d0a1234'), false)
+  assert.equal(isResearchSession('session-6c1f7a52-2b22-4c66-9d3e-5f3d9d0a1234'), false)
   assert.equal(isResearchSession(''), false)
 })

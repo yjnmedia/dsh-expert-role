@@ -71,7 +71,7 @@ mod.apply(ctx, {})
 
 assert.equal(seen.providers.length, 1, '应注册一个 skills provider')
 assert.equal(seen.tools.length, 14, '应注册 14 个工具')
-assert.equal(seen.routes.length, 16, '应注册 16 条路由（含 /api/retrieval、资料目录三条与建会话）')
+assert.equal(seen.routes.length, 18, '应注册 18 条路由（含检索、资料目录三条、建会话、会话动态、模型下载）')
 assert.equal(seen.prompts.length, 1, '应注册 1 条静态系统提示词')
 assert.match(seen.prompts[0].name, /^[a-z0-9-]+:[a-z0-9-]+$/, '提示词 name 应为 命名空间:名称')
 assert.ok(seen.prompts[0].text.includes('lookup_expert_knowledge'), '提示词应点名查资料工具')

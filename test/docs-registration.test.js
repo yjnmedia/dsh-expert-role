@@ -10,7 +10,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { ExpertLibrary } from '../lib/library.js'
 
-const ROOT = process.env.DSH_EXPERT_ROOT || 'D:/experts-demo'
+const ROOT = process.env.DSH_EXPERT_ROOT || 'E:/000Dev/AIExperts'
 const hasLibrary = fs.existsSync(ROOT)
 
 function resourcesOf(refDir) {

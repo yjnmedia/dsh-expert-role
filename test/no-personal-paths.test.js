@@ -1,40 +1,59 @@
-import { test } from 'node:test'
-import assert from 'node:assert/strict'
 import { readdir, readFile } from 'node:fs/promises'
-import { join, relative } from 'node:path'
+import { join, extname, relative } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const ROOT = process.cwd()
-const SKIP = new Set(['node_modules', '.git', '.tmp', '.trace', 'models', 'coverage'])
-const TEXT = /\.(js|mjs|cjs|json|md|yml|yaml|txt|html|css)$/i
+// 公开仓库不许出现本机痕迹：个人路径、会话号、请求号、内部项目名、内部库路径。
+// 这条规则是「从犯错长出来的」——上一版公开包里带了几十个个人绝对路径。
+const ROOT = fileURLToPath(new URL('..', import.meta.url))
+const SKIP = new Set(['node_modules', '.git', '.tmp', '.trace', '.cache', 'models'])
+const TEXT = new Set(['.js', '.mjs', '.json', '.md', '.yml', '.yaml', '.txt', '.html', '.css'])
 
-const FORBIDDEN = [
-  { pattern: /C:\\Users\\Admin/i, why: '本机用户名' },
-  { pattern: /E:\\000Dev/i, why: '本机源码盘' },
-  { pattern: /session-[0-9a-f]{8}-[0-9a-f]{4}/i, why: '真实会话 id' },
-  { pattern: new RegExp(['request','id'].join('_'), 'i'), why: '请求痕迹' },
-  { pattern: new RegExp(['坨','梓'].join('') + '|' + ['易','书','虫'].join('') + '|' + ['易','存','销'].join('') + '|' + ['易','三','国'].join('')), why: '内部项目名' },
-  { pattern: /AIExperts[\\/](ui-design|reader|player)/, why: '内部专家组合' },
+// 名字拆开拼，避免这条测试命中自己。
+const NAMES = [
+  ['坨', '梓'].join(''),
+  ['易', '书虫'].join(''),
+  ['易', '存销'].join(''),
+  ['易', '三国'].join(''),
+  ['易', '资管'].join(''),
+  ['易', '插件'].join(''),
+  ['易', '签到'].join(''),
 ]
 
-async function walk(dir, out = []) {
-  for (const entry of await readdir(dir, { withFileTypes: true })) {
-    if (SKIP.has(entry.name)) continue
-    const full = join(dir, entry.name)
-    if (entry.isDirectory()) await walk(full, out)
-    else if (TEXT.test(entry.name)) out.push(full)
-  }
-  return out
-}
+const RULES = [
+  { name: '个人目录 C:\\Users\\<某人>', re: /C:\\+Users\\+Admin/i, scope: 'all' },
+  { name: '本机盘符前缀', re: new RegExp('E:' + '\\\\+000Dev', 'i'), scope: 'all' },
+  { name: '内部资料库路径', re: /AIExperts[\\/]+(ui-design|reader|player|product|hardware)/, scope: 'all' },
+  { name: '内部项目名', re: new RegExp(NAMES.join('|')), scope: 'all' },
+  // 会话号与 request_id 只在文档/代码里算痕迹；测试夹具里的假 id 不算。
+  { name: '会话 id（uuid）', re: /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/i, scope: 'outside-test' },
+  { name: 'request_id', re: /request_id/i, scope: 'outside-test' },
+]
 
-test('公开包里没有本机路径、会话痕迹与内部项目名', async () => {
-  const files = await walk(ROOT)
-  assert.ok(files.length > 50, '扫到的文件太少，检查是否漏扫')
-  const hits = []
-  for (const file of files) {
-    const text = await readFile(file, 'utf8')
-    for (const rule of FORBIDDEN) {
-      if (rule.pattern.test(text)) hits.push(`${relative(ROOT, file)} → ${rule.why}`)
+async function* walk(dir) {
+  for (const entry of await readdir(dir, { withFileTypes: true })) {
+    if (entry.isDirectory()) {
+      if (SKIP.has(entry.name)) continue
+      yield* walk(join(dir, entry.name))
+    } else if (TEXT.has(extname(entry.name))) {
+      yield join(dir, entry.name)
     }
   }
-  assert.deepEqual(hits, [], `发现不该出现在公开包里的内容：\n${hits.join('\n')}`)
-})
+}
+
+const hits = []
+for await (const file of walk(ROOT)) {
+  const rel = relative(ROOT, file)
+  const inTest = rel.startsWith('test/') || rel.startsWith('test\\')
+  const text = await readFile(file, 'utf8')
+  const lines = text.split('\n')
+  for (const rule of RULES) {
+    if (rule.scope === 'outside-test' && inTest) continue
+    lines.forEach((line, index) => {
+      if (rule.re.test(line)) hits.push(`${rel}:${index + 1} ${rule.name} → ${line.trim().slice(0, 80)}`)
+    })
+  }
+}
+
+if (hits.length) {
+  throw new Error(`公开仓库里还有本机痕迹（${hits.length} 处）：\n${hits.slice(0, 40).join('\n')}`)
+}

@@ -14,7 +14,7 @@ import { judgeNeeds, judgeFields } from '../lib/session-log.js'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const repo = path.join(here, '..')
-const ROOT = process.env.DSH_EXPERT_ROOT || 'D:/experts-demo'
+const ROOT = process.env.DSH_EXPERT_ROOT || 'E:/000Dev/AIExperts'
 const hasLibrary = fs.existsSync(ROOT)
 const skip = !hasLibrary && `找不到资料库 ${ROOT}`
 

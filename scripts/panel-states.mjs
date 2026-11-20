@@ -35,6 +35,8 @@ export const STATE_NAMES = [
   'taxonomy',
   'gapRuns',
   'sessionLog',
+  'modelState',
+  'modelBusy',
 ]
 
 // 从「名字 → 值」的具名表拼出 useState 返回值数组，顺序由 STATE_NAMES 决定。

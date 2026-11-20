@@ -43,7 +43,7 @@ test('工具写入的 trace 带上调用方会话', async (t) => {
   const library = await tempLibrary(t)
   const tools = createToolDefinitions(library, {})
   const find = (name) => tools.find((tool) => tool.name === name)
-  const exec = { agent: { session: { id: 'session-demo-2-3333-4444-555555555555' } } }
+  const exec = { agent: { session: { id: 'session-11111111-2222-3333-4444-555555555555' } } }
 
   await find('expert_create').execute({ id: 'demo', title: '演示', description: '测试用' }, exec)
   await find('expert_plan').execute({ expert: 'demo', goal: '查清 A', mode: 'serial', steps: ['第一步'] }, exec)
@@ -51,7 +51,7 @@ test('工具写入的 trace 带上调用方会话', async (t) => {
   const entries = await library.traceTail(10)
   assert.ok(entries.length >= 2)
   for (const entry of entries) {
-    assert.equal(entry.session, 'session-demo-2-3333-4444-555555555555', `缺少会话：${JSON.stringify(entry)}`)
+    assert.equal(entry.session, 'session-11111111-2222-3333-4444-555555555555', `缺少会话：${JSON.stringify(entry)}`)
   }
 })
 

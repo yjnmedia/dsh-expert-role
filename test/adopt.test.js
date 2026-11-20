@@ -16,25 +16,25 @@ function fakeController({ created = true, id = 'ws-1', title = 'AIExperts', fail
 
 test('把目录采纳成工作区，返回 id 与标题', async () => {
   const controller = fakeController()
-  const out = await adoptWorkspace(controller, 'D:\\experts-demo')
+  const out = await adoptWorkspace(controller, 'D:\experts-demo')
 
   assert.equal(out.ok, true)
   assert.equal(out.created, true)
   assert.equal(out.id, 'ws-1')
   assert.equal(out.title, 'AIExperts')
-  assert.deepEqual(controller.calls, [{ path: 'D:\\experts-demo' }])
+  assert.deepEqual(controller.calls, [{ path: 'D:\experts-demo' }])
 })
 
 test('已经是工作区时返回 created=false，但算成功', async () => {
-  const out = await adoptWorkspace(fakeController({ created: false }), 'D:\\experts-demo')
+  const out = await adoptWorkspace(fakeController({ created: false }), 'D:\experts-demo')
 
   assert.equal(out.ok, true)
   assert.equal(out.created, false)
 })
 
 test('宿主没有工作区服务时给出原因，不抛错', async () => {
-  assert.deepEqual(await adoptWorkspace(undefined, 'D:\\experts-demo'), { ok: false, reason: 'no-service' })
-  assert.deepEqual(await adoptWorkspace({}, 'D:\\experts-demo'), { ok: false, reason: 'no-service' })
+  assert.deepEqual(await adoptWorkspace(undefined, 'D:\experts-demo'), { ok: false, reason: 'no-service' })
+  assert.deepEqual(await adoptWorkspace({}, 'D:\experts-demo'), { ok: false, reason: 'no-service' })
 })
 
 test('没有目录时直接拒绝', async () => {

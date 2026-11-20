@@ -119,7 +119,7 @@ test('回填：写进历史、重复跑不重复写', async () => {
   const home = await mkdtemp(join(tmpdir(), 'dshhome-'))
   const root = await mkdtemp(join(tmpdir(), 'lib-'))
   const sessionId = 'session-expert-cat-06'
-  const dir = join(home, 'sessions', '--D-experts-demo--', sessionId)
+  const dir = join(home, 'sessions', '--E-000Dev-AIExperts--', sessionId)
   await mkdir(dir, { recursive: true })
   const lines = [
     { type: 'turn/start', time: 1000 },

@@ -107,19 +107,19 @@ const experts = [
   },
 ]
 const trace = [
-  { ts: iso(60e3), kind: 'ref_read', session: 'session-demo-1', sessionTitle: '示例会话 A', expert: 'demo-expert', path: 'references/a.md', chars: 1024 },
-  { ts: iso(120e3), kind: 'subagent', session: 'session-demo-1', sessionTitle: '示例会话 A', expert: 'demo-expert', children: ['session-demo-task'] },
+  { ts: iso(60e3), kind: 'ref_read', session: 'session-demo-a', sessionTitle: '示例会话 A', expert: 'demo-expert', path: 'references/a.md', chars: 1024 },
+  { ts: iso(120e3), kind: 'subagent', session: 'session-demo-a', sessionTitle: '示例会话 A', expert: 'demo-expert', children: ['session-demo-task'] },
   { ts: iso(180e3), kind: 'ref_read', session: 'session-demo-task', sessionTitle: '演示调研', expert: 'demo-expert', path: 'references/c.md', chars: 900 },
   { ts: iso(240e3), kind: 'workspace', session: 'session-expert-demo-expert-1794790000000', sessionTitle: '演示工作区', expert: 'demo-expert' },
   { ts: iso(300e3), kind: 'skill_load', session: 'session-demo-task', sessionTitle: '演示调研', expert: 'demo-expert', chars: 661 },
-  { ts: iso(360e3), kind: 'remind', session: 'session-demo-1', sessionTitle: '示例会话 A', expert: 'demo-expert', chars: 120 },
+  { ts: iso(360e3), kind: 'remind', session: 'session-demo-a', sessionTitle: '示例会话 A', expert: 'demo-expert', chars: 120 },
   { ts: iso(420e3), kind: 'write', expert: 'demo-expert', path: 'references/b.md', chars: 300 },
   // 子会话（subagent tool 开的盲测会话）：必须并进父会话，不能单列一条
-  { ts: iso(450e3), kind: 'skill_load', session: 'session-demo-3', sessionTitle: '子会话：测一次加载', sessionSubagentLabel: '测模型是否主动加载专家技能', sessionParentId: 'session-demo-1', sessionParentTitle: '示例会话 A', expert: 'demo-expert', chars: 202 },
-  { ts: iso(480e3), kind: 'ref_read', session: 'session-demo-2', sessionTitle: '示例会话 B', expert: 'demo-expert', path: 'references/d.md', chars: 2048 },
-  { ts: iso(540e3), kind: 'skill_load', session: 'session-demo-2', sessionTitle: '示例会话 B', expert: 'empty-expert', chars: 512 },
-  { ts: iso(600e3), kind: 'miss', session: 'session-demo-1', sessionTitle: '示例会话 A', expert: 'demo-expert', query: '同行控件高度不一致导致布局位移' },
-  { ts: iso(660e3), kind: 'miss', session: 'session-demo-2', sessionTitle: '示例会话 B', expert: 'demo-expert', query: '正文行高与字号怎么配' },
+  { ts: iso(450e3), kind: 'skill_load', session: 'session-demo-sub', sessionTitle: '你在一台 Windows 机器上做一次', sessionSubagentLabel: '测模型是否主动加载专家技能', sessionParentId: 'session-demo-a', sessionParentTitle: '示例会话 A', expert: 'demo-expert', chars: 202 },
+  { ts: iso(480e3), kind: 'ref_read', session: 'session-demo-b', sessionTitle: '示例会话 B', expert: 'demo-expert', path: 'references/d.md', chars: 2048 },
+  { ts: iso(540e3), kind: 'skill_load', session: 'session-demo-b', sessionTitle: '示例会话 B', expert: 'empty-expert', chars: 512 },
+  { ts: iso(600e3), kind: 'miss', session: 'session-demo-a', sessionTitle: '示例会话 A', expert: 'demo-expert', query: '同行控件高度不一致导致布局位移' },
+  { ts: iso(660e3), kind: 'miss', session: 'session-demo-b', sessionTitle: '示例会话 B', expert: 'demo-expert', query: '正文行高与字号怎么配' },
 ]
 const day = (n) => new Date(now - n * 86400e3).toISOString().slice(0, 10)
 const stats = {
@@ -189,10 +189,10 @@ const sessionLogFixture = [
 ]
 
 const dataDirFixture = {
-  active: 'E:\\000Dev\\AIExperts',
-  defaultDir: 'C:\\Users\\Admin\\.dsh\\expert-role\\experts',
+  active: 'D:\experts-demo',
+  defaultDir: 'C:\Users\someone\\.dsh\\expert-role\\experts',
   candidates: [
-    { dir: 'E:\\000Dev\\AIExperts', kind: 'pointer', experts: 13, systemDrive: false },
+    { dir: 'D:\experts-demo', kind: 'pointer', experts: 13, systemDrive: false },
   ],
   source: 'default',
   overridden: false,
@@ -212,6 +212,8 @@ function seqFor(tab, expertsList, openId, catOverride) {
     stats,
     audit,
     tab,
+    modelState: { installed: false, dir: 'D:\\experts-demo\\models\\bge-small-zh', source: 'none', job: { status: 'idle' } },
+    modelBusy: false,
     cat: catOverride !== undefined ? catOverride : (tab === 'experts' ? '工程与交付' : ''),
     error: '',
     mode: 'on-request',
@@ -393,7 +395,7 @@ for (const [name, seq] of tabs) {
   }
   {
     const src = fs.readFileSync(new URL('../lib/client.js', import.meta.url), 'utf8')
-    if (src.includes('rgba(250, 250, 252')) failures.push('刷新：还留着整块白闪遮罩（交互建议去掉）')
+    if (src.includes('rgba(250, 250, 252')) failures.push('刷新：还留着整块白闪遮罩（某个应用建议去掉）')
     if (!src.includes('刷新中')) failures.push('刷新：没有「刷新中」状态')
     if (!src.includes('opacity 100ms ease-out')) failures.push('刷新：没有数据回来后的 100ms 淡入')
   }

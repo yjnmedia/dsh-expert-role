@@ -1,7 +1,7 @@
 {
   "name": "dsh-expert-role",
   "version": "2.2.0",
-  "description": "专家库：按主题组织的领域资料 + 资料级检索 + 尽调工作流 + 调用可视化。",
+  "description": "专家角色：领域专家库 + 尽调工作流（并行/串行/独立工作区）+ 调用可视化。",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -11,12 +11,14 @@
   },
   "files": [
     "lib",
+    "scripts",
     "docs",
     "taxonomy.json",
     "bundled",
     "cordis.patch.yml",
     "README.md",
     "README.en.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "scripts": {

@@ -25,7 +25,7 @@ const childExec = (id = 'session-expert-task-1234') => ({ agent: { session: { id
 
 test('isDispatchChild 只认派发子会话', () => {
   assert.equal(isDispatchChild(childExec()), true)
-  assert.equal(isDispatchChild({ agent: { session: { id: 'session-demo-2-3333-4444-555555555555' } } }), false)
+  assert.equal(isDispatchChild({ agent: { session: { id: 'session-11111111-2222-3333-4444-555555555555' } } }), false)
   assert.equal(isDispatchChild({}), false)
 })
 
