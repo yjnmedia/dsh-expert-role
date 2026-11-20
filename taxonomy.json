@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "note": "默认资料分类。技术类以国外体系为骨架（CS2023 / SWEBOK / ISO 25010），只在需要时可加第八类。本文件随插件发布，本地库若在同目录放 taxonomy.json 则以本地为准。",
+  "groups": [
+    { "id": "platform", "title": "平台与运行", "order": 1, "desc": "操作系统、运行时、容器、部署与进程管理" },
+    { "id": "engineering", "title": "工程与交付", "order": 2, "desc": "构建、测试、发布、依赖与工程规范" },
+    { "id": "interface", "title": "界面与体验", "order": 3, "desc": "视觉、排版、控件、交互与无障碍" },
+    { "id": "content", "title": "内容生产", "order": 4, "desc": "图像、视频、文本等成品的生产方法与工具" },
+    { "id": "agent", "title": "人工智能", "order": 5, "desc": "模型调用、提示、检索、Agent 工作机制" },
+    { "id": "terminal", "title": "终端与场景", "order": 6, "desc": "阅读器、播放器、游戏、移动端等具体终端形态" },
+    { "id": "business", "title": "业务与运营", "order": 7, "desc": "商品、库存、交易、流程等行业规则" },
+    { "id": "misc", "title": "专业技术", "order": 99, "desc": "暂时不归属以上任何一类，或管资料库本身" }
+  ]
+}

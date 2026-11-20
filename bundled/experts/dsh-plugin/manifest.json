@@ -1,0 +1,89 @@
+{
+  "id": "dsh-plugin",
+  "title": "插件开发专家",
+  "description": "DSH 插件与技能开发资料库：包结构、注入通道、工具与技能注册、会话事件、常见崩溃点。",
+  "level1": "工程与交付",
+  "level2": "",
+  "mode": "serial",
+  "status": "ready",
+  "updatedAt": "2026-11-20T00:00:00.000Z",
+  "whenToUse": "要写或改一个 DSH 插件、排查插件把宿主弄坏的问题时",
+  "triggerWords": [
+    "插件",
+    "技能包",
+    "cordis",
+    "注入",
+    "patch.yml"
+  ],
+  "topics": [
+    {
+      "id": "structure",
+      "title": "结构与入口",
+      "whenToUse": "从零建一个插件时",
+      "files": [
+        "references/01-插件的最小结构.md"
+      ]
+    },
+    {
+      "id": "inject",
+      "title": "注入与注册",
+      "whenToUse": "工具/技能注册或服务 pending 时",
+      "files": [
+        "references/02-注入通道与工具注册.md"
+      ]
+    },
+    {
+      "id": "events",
+      "title": "会话与后台任务",
+      "whenToUse": "要监听会话或跑后台任务时",
+      "files": [
+        "references/03-会话事件与后台任务.md"
+      ]
+    },
+    {
+      "id": "crash",
+      "title": "故障排查",
+      "whenToUse": "宿主崩了、面板错位、事件收不到时",
+      "files": [
+        "references/04-常见崩溃点.md"
+      ]
+    }
+  ],
+  "titles": {
+    "references/01-插件的最小结构.md": "插件的最小结构与三类入口",
+    "references/02-注入通道与工具注册.md": "注入通道与工具注册",
+    "references/03-会话事件与后台任务.md": "会话事件与后台任务",
+    "references/04-常见崩溃点.md": "插件常见崩溃点与排查顺序"
+  },
+  "summaries": {
+    "插件的最小结构与三类入口": "package.json 的 main/dsh/engines/files 怎么填，apply 必须可重复执行；面板、工具、技能三类入口。",
+    "注入通道与工具注册": "inject 是必需服务，可选服务用 ctx.get；技能 provider 必须带 name，写成 id 会让宿主崩。",
+    "会话事件与后台任务": "agent/turn-stopping 的 payload 是 { agent }；agents.create 不登记工作区，要写可见会话得走 sessionController.create。",
+    "插件常见崩溃点与排查顺序": "六类现象：安全模式、pending、路径错位、面板状态错位、事件重复、热重载样式不更新。"
+  },
+  "queries": {
+    "插件的最小结构与三类入口": [
+      "插件结构",
+      "怎么写插件",
+      "package.json dsh"
+    ],
+    "注入通道与工具注册": [
+      "inject",
+      "ctx.get",
+      "工具注册",
+      "技能 provider"
+    ],
+    "会话事件与后台任务": [
+      "session/event",
+      "turn-stopping",
+      "后台任务",
+      "建会话"
+    ],
+    "插件常见崩溃点与排查顺序": [
+      "插件崩了",
+      "pending",
+      "面板错位",
+      "热重载"
+    ]
+  }
+}
