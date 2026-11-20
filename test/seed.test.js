@@ -19,15 +19,15 @@ test('自带专家首次启动复制进库，第二次不再动用户文件', as
   const base = await mkdtemp(join(tmpdir(), 'seed-expert-'))
   const bundledRoot = join(base, 'bundled')
   const root = join(base, 'lib')
-  await makeBundle(bundledRoot, ['ui-design', 'dsh-plugin'])
+  await makeBundle(bundledRoot, ['guide', 'dsh-plugin'])
   const library = new ExpertLibrary(root)
 
   const first = await seedBundledExperts(library, { bundledRoot })
-  assert.deepEqual(first.sort(), ['dsh-plugin', 'ui-design'])
-  assert.ok((await readdir(root)).includes('ui-design'))
+  assert.deepEqual(first.sort(), ['dsh-plugin', 'guide'])
+  assert.ok((await readdir(root)).includes('guide'))
 
   // 用户改过的内容不能被覆盖
-  const skill = join(root, 'ui-design', 'SKILL.md')
+  const skill = join(root, 'guide', 'SKILL.md')
   await writeFile(skill, '用户自己改的\n', 'utf8')
   const second = await seedBundledExperts(library, { bundledRoot })
   assert.deepEqual(second, [])
@@ -45,5 +45,5 @@ test('包内没有 bundled 目录时安静跳过', async () => {
 })
 
 test('自带清单只含设计专家与插件专家', () => {
-  assert.deepEqual([...BUNDLED_EXPERTS].sort(), ['dsh-plugin', 'ui-design'])
+  assert.deepEqual([...BUNDLED_EXPERTS].sort(), ['dsh-plugin', 'guide'])
 })
