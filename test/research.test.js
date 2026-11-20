@@ -4,6 +4,7 @@ import { mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import {
+  busySessionIds,
   categorySessionId,
   isCategorySession,
   runIdentity,
@@ -135,4 +136,16 @@ test('回合真结束了才自愈，没结束不算', () => {
   assert.equal(turnFinished([{ type: 'turn/start', time: now }, { type: 'tool/call', time: now + 5 }]), false)
   assert.equal(turnFinished([]), false)
   assert.equal(finishedAt([{ type: 'turn/end', time: 1795152381447 }]), new Date(1795152381447).toISOString())
+})
+
+
+test('busySessionIds 只捞正在跑的会话，去重', () => {
+  const ids = busySessionIds([
+    { sessionId: 'session-expert-cat-03', status: 'running' },
+    { sessionId: 'session-expert-cat-03', status: 'done' },
+    { sessionId: 'session-expert-cat-06', status: 'running' },
+    { sessionId: '', status: 'running' },
+  ])
+  assert.deepEqual([...ids].sort(), ['session-expert-cat-03', 'session-expert-cat-06'])
+  assert.equal(busySessionIds(null).size, 0)
 })

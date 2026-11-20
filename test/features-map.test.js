@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 // 功能地图的确定性检查：
 //   1) 面板里每个页签（client.js 里 setTab('<key>')）都要在 docs/features/tab-<key>.md 有卡；
 //   2) 每张工具卡（docs/features/tool-*.md）标题里点到的工具名，必须真的在 lib/tools.js 注册；
@@ -54,4 +55,15 @@ test('会话提示词里写清了三段式与标记', () => {
   for (const word of ['结论：', '证据：', '待办：', '【要你看·花额度】', '【不用你看】']) {
     if (!text.includes(word)) throw new Error('docs/session-prompts.md 缺「' + word + '」：三段式或标记被删了')
   }
+})
+
+test('提示词文档锁住三条硬规则：三段、标记、机器读的部分 ASCII', async () => {
+  const text = readFileSync(fileURLToPath(new URL('../docs/session-prompts.md', import.meta.url)), 'utf8')
+  for (const need of ['结论：', '证据：', '待办：', '【要你看·花额度】', '【不用你看】']) {
+    assert.ok(text.includes(need), '提示词缺少「' + need + '」')
+  }
+  assert.ok(text.includes('机器读的部分写成 ASCII'), '缺少 ASCII 参数规矩')
+  assert.ok(text.includes('不要用中文做文件名'), '缺少文件名规矩')
+  assert.ok(text.includes('不要加'), '缺少「不要加额外格式」的禁止项')
+  assert.ok(!text.includes('experts-demo'), '提示词里不该写死演示路径，应使用占位')
 })

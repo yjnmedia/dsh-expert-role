@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { fileURLToPath } from 'node:url'
-import { parsePrompts, loadPrompts } from '../lib/session-prompts.js'
+import { fillRoot, parsePrompts, loadPrompts } from '../lib/session-prompts.js'
 
 const DOC = fileURLToPath(new URL('../docs/session-prompts.md', import.meta.url))
 
@@ -29,4 +29,11 @@ test('不带编号的章节（首条消息）不会被当成大类', () => {
 
 test('少于八段时直接报错，不静默少建', async () => {
   await assert.rejects(() => loadPrompts(fileURLToPath(new URL('./fixtures/not-enough.md', import.meta.url))))
+})
+
+
+test('fillRoot 把 <库根> 换成本机路径，结尾斜杠去掉', () => {
+  assert.equal(fillRoot('目录：<库根>\\03-界面与体验', 'D:\\experts\\'), '目录：D:\\experts\\03-界面与体验')
+  assert.equal(fillRoot('没有占位', 'D:\\experts'), '没有占位')
+  assert.equal(fillRoot('<库根>', ''), '<库根>')
 })
