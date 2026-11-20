@@ -23,8 +23,8 @@ The plugin does three things only: **turn material into a loadable skill**, **ke
 ## Install
 
 ```bash
-git clone https://github.com/yjnmedia/dsh-expert-role-public.git
-cd dsh-expert-role-public
+git clone https://github.com/yjnmedia/dsh-expert-role.git
+cd dsh-expert-role
 dsh plugin --profile desktop add .
 ```
 

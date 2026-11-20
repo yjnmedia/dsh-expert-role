@@ -53,11 +53,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yjnmedia/dsh-expert-role-public.git"
+    "url": "git+https://github.com/yjnmedia/dsh-expert-role.git"
   },
-  "homepage": "https://github.com/yjnmedia/dsh-expert-role-public#readme",
+  "homepage": "https://github.com/yjnmedia/dsh-expert-role#readme",
   "bugs": {
-    "url": "https://github.com/yjnmedia/dsh-expert-role-public/issues"
+    "url": "https://github.com/yjnmedia/dsh-expert-role/issues"
   },
   "author": "yjnmedia"
 }
