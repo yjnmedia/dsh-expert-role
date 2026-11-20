@@ -69,8 +69,8 @@
 ## 安装
 
 ```bash
-git clone https://github.com/yjnmedia/dsh-expert-role.git
-cd dsh-expert-role
+git clone https://github.com/yjnmedia/dsh-expert-role-public.git
+cd dsh-expert-role-public
 dsh plugin --profile desktop add .
 ```
 
