@@ -59,5 +59,8 @@
   "bugs": {
     "url": "https://github.com/yjnmedia/dsh-expert-role/issues"
   },
-  "author": "yjnmedia"
+  "author": "yjnmedia",
+  "dependencies": {
+    "onnxruntime-node": "^1.31.1"
+  }
 }
