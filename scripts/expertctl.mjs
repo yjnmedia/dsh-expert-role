@@ -98,26 +98,25 @@ async function cmdDoctor(argv) {
     }
   }
 
-  // 4) 工作区里只该有八个大类会话：多出来的都是越界新建的
+  // 4) 会话归属：登记表里要有 8 个大类会话，磁盘上也都要有
   try {
-    const home = process.env.DSH_HOME || path.join(process.env.USERPROFILE || process.env.HOME || '', '.dsh')
-    const wsFile = path.join(home, 'storages', 'workspace.json')
-    if (fs.existsSync(wsFile)) {
-      const store = JSON.parse(fs.readFileSync(wsFile, 'utf8'))
-      const table = store?.tables?.workspaces || {}
-      const row = Object.values(table).find((item) => String(item?.path || '').replace(/\\/g, '/').toLowerCase() === root.replace(/\\/g, '/').toLowerCase())
-      if (!row) {
-        problems.push('工作区表里找不到这个资料目录：' + root)
-      } else {
-        const ids2 = Array.isArray(row.sessionIds) ? row.sessionIds : []
-        const cats = ids2.filter((id) => /^session-expert-cat-0[1-8]$/.test(String(id)))
-        const extra = ids2.filter((id) => !/^session-expert-cat-0[1-8]$/.test(String(id)))
-        if (cats.length !== 8) problems.push('工作区里应有 8 个「大类会话」，现在 ' + cats.length + ' 个')
-        if (extra.length) problems.push('工作区里多了不是大类的会话：' + extra.join('、'))
+    const { inspectSessions } = await import('../lib/session-registry.js')
+    const state = inspectSessions({ root })
+    if (!state.workspace) {
+      problems.push('工作区表里找不到这个资料目录：' + root)
+    } else {
+      if (state.missingInRegistry.length) {
+        problems.push('这些会话磁盘上有、登记表里没有（侧栏看不见）：' + state.missingInRegistry.join('、') + '；重启插件会自动补，补完再重启客户端')
+      }
+      if (state.missingOnDisk.length) {
+        problems.push('这些会话登记表里有、磁盘上没有：' + state.missingOnDisk.join('、'))
+      }
+      if (state.unknown.length) {
+        problems.push('这些大类会话还没建：' + state.unknown.join('、'))
       }
     }
   } catch (error) {
-    problems.push('读工作区登记失败：' + (error?.message ?? error))
+    problems.push('检查会话归属失败：' + (error?.message ?? error))
   }
 
   const report = { root, source: resolveDataDirSync().source, experts: ids.length, categories: categories.length, problems }
@@ -191,28 +190,20 @@ async function cmdPanel(argv) {
 }
 
 async function cmdSession(argv) {
-  const action = argv.filter((a) => !a.startsWith('--'))[0] || 'list'
-  if (action !== 'list') {
-    console.error('session 只有 list：发消息要走面板或宿主接口（本命令只读）。')
-    process.exit(2)
-  }
   const { root } = await openLibrary()
-  const dsh = (await import('../lib/datadir.js')).dshHome()
-  const wsFile = path.join(dsh, 'storages', 'workspace.json')
-  if (!fs.existsSync(wsFile)) {
-    console.error('找不到工作区登记：' + wsFile)
-    process.exit(2)
+  const { inspectSessions } = await import('../lib/session-registry.js')
+  const state = inspectSessions({ root })
+  if (!state.workspace) {
+    console.error('这个目录还没登记成工作区：' + root)
+    process.exit(1)
   }
-  const ws = JSON.parse(fs.readFileSync(wsFile, 'utf8'))
-  const list = Array.isArray(ws) ? ws : ws.workspaces || []
-  const mine = list.filter((w) => String(w.path || '').toLowerCase() === root.toLowerCase())
-  if (!mine.length) {
-    console.log('这个目录还没登记成工作区：' + root)
-    return
-  }
-  const ids = mine.flatMap((w) => w.sessionIds || [])
-  console.log('工作区：' + root + '，会话 ' + ids.length + ' 个')
-  ids.slice().sort().forEach((id) => console.log('  ' + id))
+  console.log('工作区：' + root + '（id ' + state.workspace.id + '）')
+  console.log('登记 ' + state.workspace.sessionIds.length + ' 条，磁盘 ' + state.present.length + ' 条')
+  state.present.slice().sort().forEach((id) => console.log('  ' + id))
+  if (state.missingInRegistry.length) console.log('缺登记：' + state.missingInRegistry.join('、'))
+  if (state.missingOnDisk.length) console.log('缺文件：' + state.missingOnDisk.join('、'))
+  if (state.unknown.length) console.log('还没建：' + state.unknown.join('、'))
+  if (!state.ok) process.exit(1)
 }
 
 async function cmdLog(argv) {
