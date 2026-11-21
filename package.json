@@ -1,6 +1,6 @@
 {
   "name": "dsh-expert-role",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "专家库：按主题组织的领域资料 + 资料级检索 + 尽调工作流 + 调用可视化",
   "type": "module",
   "main": "lib/index.js",

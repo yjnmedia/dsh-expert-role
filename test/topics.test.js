@@ -108,3 +108,39 @@ test('检索置信：低分判「可能没有」，前二分差小判「并列�
   const empty = confidenceOf([])
   assert.equal(empty.lowConfidence, true)
 })
+
+
+test('缺口次数分「历史」与「补后」：补完资料后再被问住才算新账', async () => {
+  const { topicsOf } = await import('../lib/topics.js')
+  const trace = [
+    { kind: 'miss', expert: 'ui-design', query: '同行控件高度不一致 布局位移', ts: '2026-11-20T01:00:00.000Z' },
+    { kind: 'miss', expert: 'ui-design', query: '同行控件高度不一致 布局位移', ts: '2026-11-20T02:00:00.000Z' },
+  ]
+
+  const before = topicsOf(trace, 'ui-design')
+  assert.equal(before[0].count, 2)
+  assert.equal(before[0].since, 2)
+  assert.equal(before[0].resolved, false)
+
+  const after = topicsOf(trace, 'ui-design', { sinceIso: '2026-11-21T00:00:00.000Z' })
+  assert.equal(after[0].count, 2)
+  assert.equal(after[0].since, 0)
+  assert.equal(after[0].resolved, true)
+
+  const half = topicsOf(trace, 'ui-design', { sinceIso: '2026-11-20T01:30:00.000Z' })
+  assert.equal(half[0].count, 2)
+  assert.equal(half[0].since, 1)
+  assert.equal(half[0].resolved, false)
+})
+
+test('已补资料的主题排到后面，未解决的排前面', async () => {
+  const { topicsOf } = await import('../lib/topics.js')
+  const trace = [
+    { kind: 'miss', expert: 'reader', query: '阅读器 正文行高 字号 怎么定', ts: '2026-11-19T01:00:00.000Z' },
+    { kind: 'miss', expert: 'reader', query: '阅读器 正文行高 字号 怎么定', ts: '2026-11-19T02:00:00.000Z' },
+    { kind: 'miss', expert: 'reader', query: '离线打包 版本号 更新公告', ts: '2026-11-21T01:00:00.000Z' },
+  ]
+  const topics = topicsOf(trace, 'reader', { sinceIso: '2026-11-20T00:00:00.000Z' })
+  assert.equal(topics[0].resolved, false)
+  assert.equal(topics[1].resolved, true)
+})

@@ -71,3 +71,27 @@ test('panel 缺口清单：只列真有过缺口，带最近没查到的提问',
   assert.equal(rows[0].overThreshold, true)
   assert.deepEqual(rows[0].examples, ['空状态怎么写', '控件高度不一致'])
 })
+
+
+test('gapOf：补过资料后 openMisses 归零，历史次数仍保留', async () => {
+  const { gapOf } = await import('../lib/gap.js')
+  const expert = { id: 'ui-design', maturity: { queries: { total: 4, hit: 4 } } }
+  const trace = [
+    { kind: 'miss', expert: 'ui-design', ts: '2026-11-20T01:00:00.000Z' },
+    { kind: 'miss', expert: 'ui-design', ts: '2026-11-20T02:00:00.000Z' },
+  ]
+
+  const before = gapOf(expert, trace)
+  assert.equal(before.misses, 2)
+  assert.equal(before.openMisses, 2)
+  assert.equal(before.resolved, false)
+
+  const after = gapOf(expert, trace, { sinceIso: '2026-11-21T00:00:00.000Z' })
+  assert.equal(after.misses, 2)
+  assert.equal(after.openMisses, 0)
+  assert.equal(after.resolved, true)
+
+  const half = gapOf(expert, trace, { sinceIso: '2026-11-20T01:30:00.000Z' })
+  assert.equal(half.openMisses, 1)
+  assert.equal(half.resolved, false)
+})
