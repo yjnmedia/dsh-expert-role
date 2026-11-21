@@ -84,6 +84,7 @@ const experts = [
         { key: '同行控件高度不一致导致布局位移', title: '同行控件高度不一致导致布局位移', count: 3, lastTs: iso(600e3), decision: null, auto: { action: 'handoff', to: 'dsh-plugin', why: '另一个专家更对口' }, needsApproval: false },
         { key: '正文行高与字号怎么配', title: '正文行高与字号怎么配', count: 1, lastTs: iso(660e3), decision: null, auto: { action: 'research', why: '库里没有相近内容' }, needsApproval: true },
         { key: '表格数字要不要右对齐', title: '表格数字要不要右对齐', count: 2, since: 0, resolved: true, lastTs: iso(600e3), decision: 'research', auto: { action: 'research', why: '库里没有相近内容' }, needsApproval: true },
+        { key: '按钮位置与行尾距离', title: '按钮位置与行尾距离', count: 1, since: 1, resolved: false, lastTs: iso(500e3), decision: 'research', auto: { action: 'research', why: '库里没有相近内容' }, needsApproval: true },
       ],
 
     maturity: {
@@ -237,7 +238,11 @@ function seqFor(tab, expertsList, openId, catOverride) {
     updatedAt: 0,
     loading: false,
     taxonomy: taxonomyFixture,
-    gapRuns: {},
+    gapRuns: {
+      ['demo-expert\u0000按钮位置与行尾距离']: {
+        status: 'queued', position: 2, sessionId: 'session-expert-cat-02', startedAt: iso(60e3),
+      },
+    },
     sessionLog: sessionLogFixture,
   })
 }
@@ -380,6 +385,7 @@ for (const [name, seq] of tabs) {
     if (!EN && detail.indexOf('正文行高与字号怎么配') < 0) failures.push('详情：缺口清单没有列出主题')
     if (!EN && detail.indexOf('已排队 · 等开查') < 0) failures.push('详情：点过「同意去查」的应显示已排队状态')
     if (!EN && detail.indexOf('已补资料') < 0) failures.push('详情：补过资料的缺口应标「已补资料」')
+    if (!EN && detail.indexOf('排队中 · 前面还有 1 条') < 0) failures.push('详情：排队中的缺口应显示前面还有几条')
   }
 
   if (EN) {

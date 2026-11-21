@@ -149,3 +149,51 @@ test('busySessionIds 只捞正在跑的会话，去重', () => {
   assert.deepEqual([...ids].sort(), ['session-expert-cat-03', 'session-expert-cat-06'])
   assert.equal(busySessionIds(null).size, 0)
 })
+
+
+test('排队：同一大类按顺序排，不会插队也不会重复', async () => {
+  const os = await import('node:os')
+  const path = await import('node:path')
+  const fs = await import('node:fs/promises')
+  const { enqueueRun, nextQueued, queuePosition, dequeueRun, readRuns } = await import('../lib/research.js')
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'expert-queue-'))
+
+  const a = await enqueueRun(root, { sessionId: 'session-expert-cat-03', expert: 'ui-design', key: '甲', topic: '甲' })
+  const b = await enqueueRun(root, { sessionId: 'session-expert-cat-03', expert: 'ui-design', key: '乙', topic: '乙' })
+  const other = await enqueueRun(root, { sessionId: 'session-expert-cat-06', expert: 'reader', key: '丙', topic: '丙' })
+
+  assert.equal(a.position, 1)
+  assert.equal(b.position, 2)
+  assert.equal(other.position, 1)
+
+  const again = await enqueueRun(root, { sessionId: 'session-expert-cat-03', expert: 'ui-design', key: '甲', topic: '甲' })
+  assert.equal(again.already, true)
+  assert.equal(again.position, 1)
+
+  const runs = await readRuns(root)
+  assert.equal(runs.filter((run) => run.sessionId === 'session-expert-cat-03').length, 2)
+  assert.equal(queuePosition(runs, { sessionId: 'session-expert-cat-03', expert: 'ui-design', key: '乙' }), 2)
+
+  const first = await nextQueued(root, 'session-expert-cat-03')
+  assert.equal(first.key, '甲')
+
+  const removed = await dequeueRun(root, { expert: 'ui-design', key: '甲' })
+  assert.equal(removed.removed, 1)
+  const second = await nextQueued(root, 'session-expert-cat-03')
+  assert.equal(second.key, '乙')
+})
+
+test('排队：同一大类最多 20 条，超了给提示', async () => {
+  const os = await import('node:os')
+  const path = await import('node:path')
+  const fs = await import('node:fs/promises')
+  const { enqueueRun, MAX_QUEUE } = await import('../lib/research.js')
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'expert-queue-max-'))
+
+  for (let i = 0; i < MAX_QUEUE; i += 1) {
+    const out = await enqueueRun(root, { sessionId: 'session-expert-cat-03', expert: 'ui-design', key: `题${i}`, topic: `题${i}` })
+    assert.equal(out.error, undefined)
+  }
+  const over = await enqueueRun(root, { sessionId: 'session-expert-cat-03', expert: 'ui-design', key: '再来一条', topic: '再来一条' })
+  assert.ok(over.error && over.error.includes(String(MAX_QUEUE)))
+})

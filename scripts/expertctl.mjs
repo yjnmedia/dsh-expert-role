@@ -125,7 +125,7 @@ async function cmdDoctor(argv) {
   } else {
     console.log('资料目录：' + root + '（来源 ' + report.source + '）')
     console.log('专家 ' + ids.length + ' 位，大类 ' + categories.length + ' 个')
-    if (problems.length === 0) console.log('检查通过：目录、登记、大类、状态顺序都对得上。')
+    if (problems.length === 0) console.log('检查通过：目录、登记、大类、状态顺序、会话归属都对得上。')
     else {
       console.log('发现 ' + problems.length + ' 个问题：')
       problems.forEach((p) => console.log('  - ' + p))
